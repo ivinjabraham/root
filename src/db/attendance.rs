@@ -9,4 +9,5 @@ pub struct Attendance {
     pub date: NaiveDate,
     pub timein: NaiveTime,
     pub timeout: NaiveTime,
+    pub present: bool,
 }
