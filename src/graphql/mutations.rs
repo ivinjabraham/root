@@ -10,6 +10,8 @@ pub struct MutationRoot;
 
 #[Object]
 impl MutationRoot {
+
+    //Mutation for adding members to the Member table
     async fn add_member(
         &self, 
         ctx: &Context<'_>, 
@@ -37,6 +39,8 @@ impl MutationRoot {
         Ok(member)
     }
 
+    
+    //Mutation for adding Attendance to the Attendance table
     async fn add_attendance(
         &self,
         ctx: &Context<'_>,
@@ -56,6 +60,27 @@ impl MutationRoot {
         .bind(timeout)
         .fetch_one(pool.as_ref())
         .await?;
+
+        Ok(attendance)
+    }
+    
+    async fn update_attendance_present(
+        &self,
+        ctx: &Context<'_>,
+        id: i32,
+        date: NaiveDate,
+        present: bool,
+    ) -> Result<Attendance,sqlx::Error> {
+        let pool = ctx.data::<Arc<PgPool>>().expect("Pool not found in context");
+
+        let attendance = sqlx::query_as::<_, Attendance>(
+            "UPDATE Attendance SET present = $1 WHERE id = $2 AND date = $3 RETURNING *"
+        )
+        .bind(present)
+        .bind(id)
+        .bind(date)                                                                                                                                                                         
+        .fetch_one(pool.as_ref())
+        .await?;                            
 
         Ok(attendance)
     }
